@@ -6,8 +6,6 @@ import jwt from 'jsonwebtoken'
 const JWT_SECRET = process.env.JWT_SECRET
 const TOKEN_EXPIRES = '24h';
 
-console.log("My secret is:", process.env.JWT_SECRET);
-
 const createToken = (userId) =>
     jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: TOKEN_EXPIRES });
 
