@@ -145,3 +145,43 @@ export async function downloadIncomeExcel(req, res) {
         });
     }
 }
+
+
+// TO GET INCOME OVERVIEW
+
+export async function getIncomeOverview(req,res) {
+    try {
+        const userId = req.user._id;
+        const { range = "monthly" } = req.query;
+        const { start, end } = getDateRange(range);
+
+        const incomes = await incomeModel.find({
+            userId,
+            date: {$gte: start, $lte: end},
+        }).sort({ date: -1})
+
+        const totalIncome = incomes.reduce((acc, cur) => acc + cur.amount, 0);
+        const averageIncome = incomes.length > 0 ? totalIncome / incomes.length : 0;
+        const numberOfTransactions = incomes.length;
+        const recentTransactions = incomes.slice(0, 9);
+
+        res.json({
+            success: true,
+            data: {
+                totalIncome,
+                averageIncome,
+                numberOfTransactions,
+                recentTransactions,
+                range
+            }
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+    }
+
+}
