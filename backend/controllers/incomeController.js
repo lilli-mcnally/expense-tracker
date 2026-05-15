@@ -15,7 +15,7 @@ export async function addIncome(req,res) {
             });
         }
 
-        newIncome = new incomeModel({
+        const newIncome = new incomeModel({
             userId,
             description,
             amount,
@@ -43,7 +43,7 @@ export async function addIncome(req,res) {
 export async function getAllIncome(req,res) {
     const userId = req.user._id;
     try {
-        const income = (await incomeModel.find({ userId })).toSorted({ date: -1 });
+        const income = await incomeModel.find({ userId }).sort({ date: -1 });
         res.json(income);
     }
 
@@ -122,7 +122,7 @@ export async function deleteIncome(req,res) {
 export async function downloadIncomeExcel(req, res) {
     const userId = req.user._id;
     try {
-        const income = (await incomeModel.find({ userId })).toSorted({ date: -1 });
+        const income = await incomeModel.find({ userId }).sort({ date: -1 });
         const plainData = income.map((inc) => ({
             Description: inc.description,
             Amount: inc.amount,
@@ -131,7 +131,7 @@ export async function downloadIncomeExcel(req, res) {
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(plainData);
-        const workbook = XLSX.utils.book_new;
+        const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "incomeModel");
         XLSX.writeFile(workbook, "income_details.xlsx");
         res.download("income_details.xlsx");
